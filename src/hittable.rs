@@ -64,11 +64,7 @@ impl Hittable for HittableList {
         let mut closest = interval.max;
 
         for obj in self.list.clone() {
-            if obj.hit(
-                r,
-                Interval::new(interval.min, closest),
-                &mut temp_rec,
-            ) {
+            if obj.hit(r, Interval::new(interval.min, closest), &mut temp_rec) {
                 hit_anything = true;
                 closest = temp_rec.t;
                 *rec = temp_rec.clone();
