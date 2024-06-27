@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{interval::Interval, ray::Ray, vec3::Vec3};
+use crate::{interval::Interval, material::{Material, MaterialZST}, ray::Ray, vec3::Vec3};
 
 pub trait Hittable {
     #[allow(dead_code, unused_variables)]
@@ -13,6 +13,7 @@ pub trait Hittable {
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
+    pub mat: Rc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -22,6 +23,7 @@ impl Default for HitRecord {
         Self {
             p: Default::default(),
             normal: Default::default(),
+            mat: Rc::new(MaterialZST),
             t: Default::default(),
             front_face: Default::default(),
         }

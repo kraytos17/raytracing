@@ -1,4 +1,4 @@
-use std::{f64::INFINITY, io::Write};
+use std::io::Write;
 
 use crate::{
     color::{write_color, Color},
@@ -19,10 +19,16 @@ pub struct Camera {
     pixel_delta_v: Vec3,
     samples_per_pixel: i32,
     pixel_samples_scale: f64,
+    max_depth: i32,
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_width: i32, samples_per_pixel: i32) -> Self {
+    pub fn new(
+        aspect_ratio: f64,
+        image_width: i32,
+        samples_per_pixel: i32,
+        max_depth: i32,
+    ) -> Self {
         let mut camera = Camera {
             aspect_ratio,
             image_width,
@@ -33,6 +39,7 @@ impl Camera {
             pixel_delta_v: Vec3::new(0.0, 0.0, 0.0),
             samples_per_pixel,
             pixel_samples_scale: 0.0,
+            max_depth,
         };
         camera.initialize();
         camera
@@ -77,7 +84,7 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    pixel_color += ray_color(&r, world)
+                    pixel_color += ray_color(&r, self.max_depth, world)
                 }
                 write_color(output, &(pixel_color * self.pixel_samples_scale))?;
             }
@@ -102,13 +109,27 @@ impl Camera {
     }
 }
 
-fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
+fn ray_color(r: &Ray, depth: i32, world: &dyn Hittable) -> Color {
+    if depth <= 0 {
+        return Color::new(0.0, 0.0, 0.0);
+    }
+
     let mut rec = HitRecord::default();
-    if world.hit(r, Interval::new(0.0, INFINITY), &mut rec) {
-        return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
+    if world.hit(r, Interval::new(0.001, f64::INFINITY), &mut rec) {
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+        let mut rec_copy = rec.clone();
+        if rec
+            .mat
+            .scatter(r, &mut rec_copy, &mut attenuation, &mut scattered)
+        {
+            return attenuation.cross(ray_color(&scattered, depth - 1, world));
+        } else {
+            return Color::new(0.0, 0.0, 0.0);
+        }
     }
 
     let unit_dir = Vec3::normalized(r.dir);
-    let t = 0.5 * (unit_dir.y + 1.0);
+    let t = 0.9 * (unit_dir.y + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }

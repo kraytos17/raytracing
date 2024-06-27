@@ -14,3 +14,12 @@ impl Ray {
         self.origin + t * self.dir
     }
 }
+
+impl Default for Ray {
+    fn default() -> Self {
+        Ray {
+            origin: Default::default(),
+            dir: Default::default(),
+        }
+    }
+}
