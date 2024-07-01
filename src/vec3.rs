@@ -98,6 +98,15 @@ impl Vec3 {
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
         *v - v.dot(*n) * *n * 2.0
     }
+
+    #[inline]
+    pub fn refract(a: &Vec3, n: &Vec3, eta: f64) -> Vec3 {
+        let cos_theta = f64::min(n.dot(a.neg()), 1.0);
+        let r_out_perp = eta * (*a + cos_theta * *n);
+        let r_out_par = -f64::sqrt(f64::abs(1.0 - r_out_perp.length_squared())) * *n;
+
+        r_out_par + r_out_perp
+    }
 }
 
 impl fmt::Display for Vec3 {

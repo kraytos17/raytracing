@@ -5,7 +5,7 @@ use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,
     ray::Ray,
-    utils::random_double,
+    utils::{degrees_to_radians, random_double},
     vec3::Vec3,
 };
 
@@ -20,6 +20,7 @@ pub struct Camera {
     samples_per_pixel: i32,
     pixel_samples_scale: f64,
     max_depth: i32,
+    vfov: f64,
 }
 
 impl Camera {
@@ -28,6 +29,7 @@ impl Camera {
         image_width: i32,
         samples_per_pixel: i32,
         max_depth: i32,
+        vfov: f64,
     ) -> Self {
         let mut camera = Camera {
             aspect_ratio,
@@ -40,6 +42,7 @@ impl Camera {
             samples_per_pixel,
             pixel_samples_scale: 0.0,
             max_depth,
+            vfov,
         };
         camera.initialize();
         camera
@@ -57,7 +60,9 @@ impl Camera {
         self.center = Vec3::new(0.0, 0.0, 0.0);
 
         let focal_length = 1.0;
-        let viewport_height = 2.0;
+        let theta = degrees_to_radians(self.vfov);
+        let h = f64::tan(theta / 2.0);
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * self.aspect_ratio;
 
         let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
@@ -130,6 +135,6 @@ fn ray_color(r: &Ray, depth: i32, world: &dyn Hittable) -> Color {
     }
 
     let unit_dir = Vec3::normalized(r.dir);
-    let t = 0.9 * (unit_dir.y + 1.0);
+    let t = 0.7 * (unit_dir.y + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
