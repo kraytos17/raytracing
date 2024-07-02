@@ -14,7 +14,7 @@ pub fn write_color(output: &mut dyn Write, color: &Color) -> std::io::Result<()>
     let gbyte = 256.0 * intensity.clamp(g);
     let bbyte = 256.0 * intensity.clamp(b);
 
-    writeln!(output, "{} {} {}", rbyte as i32, gbyte as i32, bbyte as i32)
+    writeln!(output, "{} {} {}", rbyte as u8, gbyte as u8, bbyte as u8)
 }
 
 impl Color {

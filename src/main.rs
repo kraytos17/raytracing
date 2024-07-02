@@ -13,20 +13,19 @@ use color::Color;
 use hittable::HittableList;
 use material::{Dielectric, Lambertian, Metal};
 use sphere::Sphere;
+use std::time::Instant;
 use std::{fs::File, rc::Rc};
 use utils::{random_double, random_double_range};
 use vec3::Vec3;
 
 fn main() -> std::io::Result<()> {
-    use std::time::Instant;
-
     let current = Instant::now();
     println!("Started rendering image");
 
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400;
-    let samples_per_pixel = 100;
-    let max_depth = 10;
+    let image_width = 800;
+    let samples_per_pixel = 400;
+    let max_depth = 20;
     let vfov = 20.0;
     let look_from = Vec3::new(13.0, 2.0, 3.0);
     let look_at = Vec3::new(0.0, 0.0, 0.0);
