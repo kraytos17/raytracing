@@ -20,11 +20,11 @@ impl Interval {
         Interval { min, max }
     }
 
-    pub fn size(&self) -> f64 {
+    pub fn _size(&self) -> f64 {
         self.max - self.min
     }
 
-    pub fn contains(&self, x: f64) -> bool {
+    pub fn _contains(&self, x: f64) -> bool {
         self.min <= x && x <= self.max
     }
 
@@ -43,12 +43,12 @@ impl Interval {
     }
 }
 
-pub const EMPTY: Interval = Interval {
+pub const _EMPTY: Interval = Interval {
     min: INFINITY,
     max: NEG_INFINITY,
 };
 
-pub const UNIVERSE: Interval = Interval {
+pub const _UNIVERSE: Interval = Interval {
     min: NEG_INFINITY,
     max: INFINITY,
 };

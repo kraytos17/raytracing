@@ -13,56 +13,89 @@ use color::Color;
 use hittable::HittableList;
 use material::{Dielectric, Lambertian, Metal};
 use sphere::Sphere;
-use std::{f64::consts::PI, fs::File, rc::Rc};
+use std::{fs::File, rc::Rc};
+use utils::{random_double, random_double_range};
 use vec3::Vec3;
 
 fn main() -> std::io::Result<()> {
     use std::time::Instant;
 
     let current = Instant::now();
+    println!("Started rendering image");
+
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 400;
     let samples_per_pixel = 100;
-    let max_depth = 50;
-    let vfov = 90.0;
+    let max_depth = 10;
+    let vfov = 20.0;
+    let look_from = Vec3::new(13.0, 2.0, 3.0);
+    let look_at = Vec3::new(0.0, 0.0, 0.0);
+    let v_up = Vec3::new(0.0, 1.0, 0.0);
+    let defocus_angle = 0.6;
+    let focus_dist = 10.0;
+
     let camera = Camera::new(
         aspect_ratio,
         image_width,
         samples_per_pixel,
         max_depth,
         vfov,
+        look_from,
+        look_at,
+        v_up,
+        defocus_angle,
+        focus_dist,
     );
 
-    //let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    //let mat_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let mat_left = Rc::new(Lambertian::new(Vec3::new(0.0, 0.0, 1.0)));
-    //let mat_bubble = Rc::new(Dielectric::new(1.00 / 1.50));
-    let mat_right = Rc::new(Lambertian::new(Vec3::new(1.0, 0.0, 0.0)));
-
-    let r = f64::cos(PI / 4.0);
+    let mat_ground = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
 
     let mut world = HittableList::new();
-    // world.add(Rc::new(Sphere::new(
-    //     Vec3::new(0.0, -100.5, -1.0),
-    //     100.0,
-    //     mat_ground,
-    // )));
-    // world.add(Rc::new(Sphere::new(
-    //     Vec3::new(0.0, 0.0, -1.2),
-    //     0.5,
-    //     mat_center,
-    // )));
-    world.add(Rc::new(Sphere::new(Vec3::new(-r, 0.0, -1.0), r, mat_left)));
-    // world.add(Rc::new(Sphere::new(
-    //     Vec3::new(-1.0, 0.0, -1.0),
-    //     0.4,
-    //     mat_bubble,
-    // )));
-    world.add(Rc::new(Sphere::new(Vec3::new(r, 0.0, -1.0), r, mat_right)));
+    world.add(Rc::new(Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        mat_ground,
+    )));
+
+    for i in -11..11 {
+        for j in -11..11 {
+            let mat_choice = random_double();
+            let center = Vec3::new(
+                i as f64 + 0.9 * random_double(),
+                0.2,
+                j as f64 + 0.9 * random_double(),
+            );
+
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if mat_choice < 0.8 {
+                    let albedo = Color::random_vec().elementwise_mul(Color::random_vec());
+                    let sphere_mat = Rc::new(Lambertian::new(albedo));
+                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_mat)));
+                } else if mat_choice < 0.95 {
+                    let albedo = Color::random_with_min_max(0.5, 1.0);
+                    let fuzz = random_double_range(0.0, 0.5);
+                    let sphere_mat = Rc::new(Metal::new(albedo, fuzz));
+                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_mat)));
+                } else {
+                    let sphere_mat = Rc::new(Dielectric::new(1.50));
+                    world.add(Rc::new(Sphere::new(center, 0.2, sphere_mat)));
+                }
+            }
+        }
+    }
+
+    let mat1 = Rc::new(Dielectric::new(1.50));
+    world.add(Rc::new(Sphere::new(Vec3::new(0.0, 1.0, 0.0), 1.0, mat1)));
+
+    let mat2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    world.add(Rc::new(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, mat2)));
+
+    let mat3 = Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    world.add(Rc::new(Sphere::new(Vec3::new(4.0, 1.0, 0.0), 1.0, mat3)));
 
     let mut file = File::create("output.ppm")?;
     camera.render(&world, &mut file)?;
     let elapsed = current.elapsed();
     println!("Elapsed time : {:.4?}", elapsed);
+
     Ok(())
 }

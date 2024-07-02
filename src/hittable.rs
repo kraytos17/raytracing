@@ -1,6 +1,11 @@
 use std::rc::Rc;
 
-use crate::{interval::Interval, material::{Material, MaterialZST}, ray::Ray, vec3::Vec3};
+use crate::{
+    interval::Interval,
+    material::{Material, MaterialZST},
+    ray::Ray,
+    vec3::Vec3,
+};
 
 pub trait Hittable {
     #[allow(dead_code, unused_variables)]

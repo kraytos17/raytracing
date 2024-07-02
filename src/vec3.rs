@@ -3,7 +3,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 
 use crate::utils::{random_double, random_double_range};
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, PartialOrd)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -50,7 +50,7 @@ impl Vec3 {
         Vec3::new(self.x * other.x, self.y * other.y, self.z * other.z)
     }
 
-    pub fn random_vec(self) -> Vec3 {
+    pub fn random_vec() -> Vec3 {
         Vec3::new(random_double(), random_double(), random_double())
     }
 
@@ -70,6 +70,19 @@ impl Vec3 {
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
             let p = Self::random_with_min_max(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let p = Vec3::new(
+                random_double_range(-1.0, 1.0),
+                random_double_range(-1.0, 1.0),
+                0.0,
+            );
             if p.length_squared() < 1.0 {
                 return p;
             }
