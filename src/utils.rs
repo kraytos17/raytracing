@@ -1,4 +1,3 @@
-use fastrand;
 
 pub fn random_double() -> f64 {
     fastrand::f64()

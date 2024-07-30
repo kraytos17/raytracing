@@ -10,7 +10,7 @@ pub trait Material {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        return false;
+        false
     }
 }
 
@@ -43,7 +43,7 @@ impl Material for Lambertian {
 
         *scattered = Ray::new(rec.p, scatter_dir);
         *attenuation = self.albedo;
-        return true;
+        true
     }
 }
 
@@ -89,7 +89,7 @@ impl Dielectric {
     fn reflectance(cos: f64, ref_idx: f64) -> f64 {
         let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         r0 = r0 * r0;
-        return r0 + (1.0 - r0) * f64::powi(1.0 - cos, 5);
+        r0 + (1.0 - r0) * f64::powi(1.0 - cos, 5)
     }
 }
 

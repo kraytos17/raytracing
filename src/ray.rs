@@ -1,5 +1,6 @@
 use crate::vec3::Vec3;
 
+#[derive(Default)]
 pub struct Ray {
     pub origin: Vec3,
     pub dir: Vec3,
@@ -15,11 +16,3 @@ impl Ray {
     }
 }
 
-impl Default for Ray {
-    fn default() -> Self {
-        Ray {
-            origin: Default::default(),
-            dir: Default::default(),
-        }
-    }
-}

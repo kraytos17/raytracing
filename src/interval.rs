@@ -1,4 +1,4 @@
-use std::f64::{INFINITY, NEG_INFINITY};
+use core::f64;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Interval {
@@ -9,8 +9,8 @@ pub struct Interval {
 impl Default for Interval {
     fn default() -> Self {
         Interval {
-            min: INFINITY,
-            max: NEG_INFINITY,
+            min: f64::INFINITY,
+            max: f64::NEG_INFINITY,
         }
     }
 }
@@ -44,11 +44,11 @@ impl Interval {
 }
 
 pub const _EMPTY: Interval = Interval {
-    min: INFINITY,
-    max: NEG_INFINITY,
+    min: f64::INFINITY,
+    max: f64::NEG_INFINITY,
 };
 
 pub const _UNIVERSE: Interval = Interval {
-    min: NEG_INFINITY,
-    max: INFINITY,
+    min: f64::NEG_INFINITY,
+    max: f64::INFINITY,
 };

@@ -10,7 +10,7 @@ use crate::{
 pub trait Hittable {
     #[allow(dead_code, unused_variables)]
     fn hit(&self, r: &Ray, interval: Interval, rec: &mut HitRecord) -> bool {
-        return false;
+        false
     }
 }
 
